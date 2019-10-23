@@ -3,8 +3,11 @@ package com.example.listview;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -36,13 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
-
         fetchData();
-
-
-
 
 
 
@@ -66,12 +63,13 @@ public class MainActivity extends AppCompatActivity {
 
                                 JSONObject resOb = redditResArray.getJSONObject(i).getJSONObject("data");
                                 tempItem.title = resOb.getString("title");
+                                tempItem.url = resOb.getString("url");
                                 Log.e("test1.1", tempItem.title);
                                 redditList.add(tempItem);
                             }
 
                             setupAdapter();
-                            Log.e("test2", redditList.toString());
+
 
 
                         } catch (JSONException e) {
@@ -103,8 +101,19 @@ public class MainActivity extends AppCompatActivity {
 //        ArrayAdapter<redditItem> adapter = new ArrayAdapter<redditItem>(
 //                this, android.R.layout.simple_list_item_1, redditList);
 //        listView.setAdapter(adapter);
-        customBaseAdapter adapter = new customBaseAdapter(this, redditList);
+        final customBaseAdapter adapter = new customBaseAdapter(this, redditList);
         ListView listView = findViewById(android.R.id.list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                redditItem item = (redditItem) adapter.getItem(position);
+
+                Intent intent = new Intent(MainActivity.this, redditWebview.class);
+                intent.putExtra("url", item.getUrl());
+                startActivity(intent);
+            }
+        });
     }
 }
